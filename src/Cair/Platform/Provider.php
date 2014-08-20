@@ -13,9 +13,16 @@ class Provider {
 	 *
 	 * @var array
 	 */
-	protected static $config;
+	protected $structure;
 
-	protected $instances;
+	protected $connection;
+
+	public function __construct($structure, $parameters)
+	{
+		$this->structure = $structure;
+
+		$this->connection = new RedisCommand(new Client($parameters));
+	}
 
 	/**
 	 * Get a connection for a collection.
@@ -25,16 +32,9 @@ class Provider {
 	 */
 	public function in($resource)
 	{
-		if(isset(static::$config['resources'][$resource]))
+		if(isset(static::$structure[$resource]))
 		{
-			if ( ! isset($this->instances[$resource]))
-			{
-				$connection = new RedisCommand(new Client);
-
-				$this->instances[$resource] = (new DynamicModel($resource))->setConnection($connection);
-			}
-
-			return $this->instances[$resource];
+			return (new DynamicModel($resource))->setConnection($this->connection);
 		}
 	}
 
@@ -49,14 +49,14 @@ class Provider {
 		return $this->in($method);
 	}
 
-	public static function setConfig($config)
+	public function setStructure($structure)
 	{
-		static::$config = $config;
+		$this->$structure = $structure;
 	}
 
-	public static function getConfig()
+	public function getStructure()
 	{
-		return static::$config;
+		return $this->$structure;
 	}
 
 }
