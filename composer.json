@@ -1,0 +1,24 @@
+{
+    "name": "cair/platform",
+    "description": "A dynamic active record implementation.",
+    "keywords": ["active", "record", "cair"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Bastian Hofmann",
+            "email": "bastianhofmann@me.com"
+        }
+    ],
+    "require": {
+        "predis/predis": "0.8.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Cair\\": "src/Cair"
+        }
+    },
+    "minimum-stability" : "dev"
+}
