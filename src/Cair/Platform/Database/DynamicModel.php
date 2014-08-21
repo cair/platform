@@ -35,6 +35,13 @@ class DynamicModel {
 	protected $primaryKey;
 
 	/**
+	 * The indicator wheter the model exists.
+	 *
+	 * @var bool
+	 */
+	protected $exists = false;
+
+	/**
 	 * Create a new dynamic model instance.
 	 *
 	 * @param string  $resource
@@ -67,9 +74,13 @@ class DynamicModel {
 	{
 		$command = $this->newCommand();
 
-		if($this->setAttributes($command->find($this->resource, $id)))
+		if($attributes = $command->find($this->resource, $id))
 		{
+			$this->exists = true;
+
 			$this->primaryKey = $id;
+
+			$this->setAttributes($attributes);
 
 			return $this;
 		}
@@ -83,6 +94,8 @@ class DynamicModel {
 
 		$this->primaryKey = $command->create($this->resource, $attributes);
 
+		$this->exists = true;
+
 		$this->attributes = $attributes;
 
 		return $this;
@@ -90,11 +103,22 @@ class DynamicModel {
 
 	public function update($attributes)
 	{
+		// If we did not fetch or create the model earlier, we just assume, the
+		// a new model should be created. We pass the parameters and return a
+		// freshly created model.
+		if ( ! $this->exists)
+		{
+			return $this->create($attributes);
+		}
+
 		$command = $this->newCommand();
 
-		$command->update($this->resource, $this->primaryKey, $attributes);
+		$result = $command->update($this->resource, $this->primaryKey, $attributes);
 
-		$this->setAttributes(array_merge($this->attributes, $attributes));
+		if($result)
+		{
+			$this->mergeAttributes($attributes);
+		}
 
 		return $this;
 	}
@@ -178,6 +202,31 @@ class DynamicModel {
 		}
 
 		$this->attributes = $attributes;
+
+		return $this;
+	}
+
+	/**
+	 * Get the attributes.
+	 *
+	 * @return array
+	 */
+	public function getAttributes()
+	{
+		return $this->attributes;
+	}
+
+	/**
+	 * Merge with the existing attributes.
+	 *
+	 * @param array   $attributes
+	 * @return self
+	 */
+	public function mergeAttributes($attributes)
+	{
+		$newAttributes = array_merge($this->getAttributes(), $attributes);
+
+		$this->setAttributes($newAttributes);
 
 		return $this;
 	}

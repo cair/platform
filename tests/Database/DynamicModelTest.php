@@ -80,7 +80,7 @@ class DynamicModelTest extends \PHPUnit_Framework_TestCase {
 			  ->andReturn(['title' => 'Foo']);
 		$c->shouldReceive('update')
 			  ->once()
-			  ->andReturn();
+			  ->andReturn(true);
 		$model = new DynamicModel('posts');
 		$model::setConnection($c);
 
@@ -89,4 +89,31 @@ class DynamicModelTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('Bar', $result->title);
 	}
 
+	function test_stores_new_model_on_update_if_current_model_does_not_exist()
+	{
+		$c = m::mock('Cair\Platform\Database\Command');
+		$c->shouldReceive('create')
+			  ->once()
+			  ->andReturn();
+		$model = new DynamicModel('posts');
+		$model::setConnection($c);
+
+		$result = $model->update(['title' => 'Bar']);
+
+		$this->assertEquals($result->title, 'Bar');
+	}
+
+	function test_can_merge_with_existing_attributes()
+	{
+		$model = new DynamicModel('posts', ['title' => 'Bar', 'content' => 'Much Content']);
+
+		$model->mergeAttributes([
+			'title' => 'Foo',
+			'author' => 'John'
+		]);
+
+		$this->assertEquals('Foo', $model->title);
+		$this->assertEquals('John', $model->author);
+		$this->assertEquals('Much Content', $model->content);
+	}
 }
