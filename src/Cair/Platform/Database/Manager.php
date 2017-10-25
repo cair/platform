@@ -22,7 +22,7 @@ class Manager {
 
 	protected function resolveRedis()
 	{
-		if ( ! isset($this->commands['redis']))
+		if (! isset($this->commands['redis']))
 		{
 			$this->commands['redis'] = new RedisCommand(new Client);
 		}
