@@ -4,9 +4,9 @@
 
 ```json
 {
-	"require": {
-		"cair/platform": "0.1.*"
-	}
+  "require": {
+    "cair/platform": "0.1.*"
+  }
 }
 ```
 
@@ -16,12 +16,12 @@
 
 ```php
 $provider = new \Cair\Platform\Provider([
-	'posts' => ['title', 'content']
+  'posts' => ['title', 'content']
 ]);
 
 $provider->posts()->create([
-	'title' => 'Welcome to Cair',
-	'content' => 'This is the underlying layer of the cair CMS.'
+  'title' => 'Welcome to Cair',
+  'content' => 'This is the underlying layer of the cair CMS.'
 ]);
 
 echo $provider->find(1)->title;
